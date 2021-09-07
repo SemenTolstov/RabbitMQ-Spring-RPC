@@ -4,18 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.util.Date;
+import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto { //createRequest(все кроме айди и даты) + UserCreateResponseDto(id + SUCCES)
-
-//    private Integer id;
+public class UserDto implements Serializable {
 
     private String login;
 
@@ -26,7 +20,5 @@ public class UserDto { //createRequest(все кроме айди и даты) +
     private String name;
 
     private String mail;
-
-//    private Date registered;
 
 }

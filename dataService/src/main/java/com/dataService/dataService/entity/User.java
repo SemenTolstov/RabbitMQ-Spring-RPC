@@ -31,7 +31,6 @@ public class User {
     private Date registered;
 
     public User(UserDto userDto) {
-//        id = userDto.getId();
         login = userDto.getLogin();
         password = userDto.getPassword();
         surname = userDto.getSurname();
@@ -39,4 +38,5 @@ public class User {
         mail = userDto.getMail();
         registered = new Date();
     }
+
 }

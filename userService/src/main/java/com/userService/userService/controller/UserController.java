@@ -1,40 +1,44 @@
 package com.userService.userService.controller;
 
-import com.dataService.dto.UserDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.dataService.dto.ResponseDto;
+import com.userService.userService.dto.CreateUserRequest;
+import com.userService.userService.service.UserService;
 import org.apache.log4j.Logger;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 
 @RestController
 public class UserController {
 
     @Autowired
-    RabbitTemplate rabbitTemplate;
+    UserService userService;
 
     Logger logger = Logger.getLogger(UserController.class);
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @PostMapping(value = "user")
-    public String publishUserDetails(UserDto userDto) {
-
-        try {
-            String jsonString = objectMapper.writeValueAsString(userDto);
-            logger.info(String.format("Emit '%s'", jsonString));
-            String response = (String) rabbitTemplate.convertSendAndReceive("query",jsonString);
-            logger.info(String.format("Received on producer '%s'", response));
-            return "returned from worker : " + response;
-            //return new UserCreateResponseDto(Integer id,)
-        } catch (Exception e) {
-           e.printStackTrace();
-           return e.getMessage();
+    public ResponseEntity publishUserDetails(@Valid @RequestBody CreateUserRequest userRequest) {
+        logger.info(String.format("Emit '%s'", userRequest));
+        ResponseDto response = userService.createUser(userRequest);
+        if (!response.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.getResult());
         }
+        logger.info(String.format("Received on producer '%s'", response));
+        return new ResponseEntity(response.getResult(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "user/{id}")
+    public ResponseEntity getUserById(@PathVariable String id) {
+        logger.info(String.format("Emit '%s'", id));
+        ResponseDto response = userService.getUserById(id);
+        if (!response.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.getResult());
+        }
+        logger.info(String.format("Received on producer '%s'", response));
+        return new ResponseEntity(response.getResult(), HttpStatus.OK);
     }
 }
