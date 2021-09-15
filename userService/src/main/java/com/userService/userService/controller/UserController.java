@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping(value = "user/{id}")
-    public ResponseEntity getUserById(@PathVariable String id) {
+    public ResponseEntity getUser(@PathVariable String id) {
         logger.info(String.format("Emit '%s'", id));
         ResponseDto response = userService.getUserById(id);
         if (!response.isSuccess()) {
